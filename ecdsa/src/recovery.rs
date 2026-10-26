@@ -2,23 +2,28 @@
 
 use crate::{Error, Result};
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "verifying")]
 use {
     crate::{
-        DigestAlgorithm, EcdsaCurve, Signature, SigningKey, VerifyingKey,
-        hazmat::{bytes2scalar, sign_prehashed_rfc6979, verify_prehashed},
+        DigestAlgorithm, EcdsaCurve, Signature, VerifyingKey,
+        hazmat::{bytes2scalar, verify_prehashed},
     },
-    digest::{Digest, Update},
+    digest::Digest,
     elliptic_curve::{
-        AffinePoint, CurveArithmetic, CurveGroup, FieldBytes, FieldBytesSize, PrimeField,
-        ProjectivePoint, Scalar,
+        AffinePoint, CurveArithmetic, CurveGroup, FieldBytesSize, PrimeField, ProjectivePoint,
         bigint::CheckedAdd,
         field,
         ops::{Invert, MulByGeneratorVartime},
         point::DecompressPoint,
         sec1::{self, FromSec1Point, ToSec1Point},
-        subtle::CtOption,
     },
+};
+
+#[cfg(feature = "signing")]
+use {
+    crate::{SigningKey, hazmat::sign_prehashed_rfc6979},
+    digest::Update,
+    elliptic_curve::{FieldBytes, Scalar, subtle::CtOption},
     signature::{
         DigestSigner, MultipartSigner, RandomizedDigestSigner, Signer,
         hazmat::{PrehashSigner, RandomizedPrehashSigner},
@@ -83,7 +88,7 @@ impl RecoveryId {
     }
 }
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "verifying")]
 impl RecoveryId {
     /// Given a public key, message, and signature, use trial recovery to determine if a suitable
     /// recovery ID exists.
@@ -175,7 +180,7 @@ impl From<RecoveryId> for u8 {
     }
 }
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "signing")]
 impl<C> SigningKey<C>
 where
     C: EcdsaCurve + CurveArithmetic + DigestAlgorithm,
@@ -217,7 +222,7 @@ where
     }
 }
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "signing")]
 impl<C, D> DigestSigner<D, (Signature<C>, RecoveryId)> for SigningKey<C>
 where
     C: EcdsaCurve + CurveArithmetic + DigestAlgorithm,
@@ -234,7 +239,7 @@ where
     }
 }
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "signing")]
 impl<C> RandomizedPrehashSigner<(Signature<C>, RecoveryId)> for SigningKey<C>
 where
     C: EcdsaCurve + CurveArithmetic + DigestAlgorithm,
@@ -250,7 +255,7 @@ where
     }
 }
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "signing")]
 impl<C, D> RandomizedDigestSigner<D, (Signature<C>, RecoveryId)> for SigningKey<C>
 where
     C: EcdsaCurve + CurveArithmetic + DigestAlgorithm,
@@ -268,7 +273,7 @@ where
     }
 }
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "signing")]
 impl<C> PrehashSigner<(Signature<C>, RecoveryId)> for SigningKey<C>
 where
     C: EcdsaCurve + CurveArithmetic + DigestAlgorithm,
@@ -279,7 +284,7 @@ where
     }
 }
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "signing")]
 impl<C> Signer<(Signature<C>, RecoveryId)> for SigningKey<C>
 where
     C: EcdsaCurve + CurveArithmetic + DigestAlgorithm,
@@ -290,7 +295,7 @@ where
     }
 }
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "signing")]
 impl<C> MultipartSigner<(Signature<C>, RecoveryId)> for SigningKey<C>
 where
     C: EcdsaCurve + CurveArithmetic + DigestAlgorithm,
@@ -304,7 +309,7 @@ where
     }
 }
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "verifying")]
 impl<C> VerifyingKey<C>
 where
     C: EcdsaCurve + CurveArithmetic,

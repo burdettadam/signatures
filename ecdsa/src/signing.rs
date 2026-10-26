@@ -37,7 +37,7 @@ use elliptic_curve::FieldBytesSize;
 use elliptic_curve::array::ArraySize;
 #[cfg(all(feature = "alloc", feature = "pkcs8"))]
 use elliptic_curve::pkcs8::{EncodePrivateKey, SecretDocument};
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "signing")]
 use {crate::VerifyingKey, elliptic_curve::PublicKey, signature::KeypairRef};
 #[cfg(feature = "der")]
 use {crate::der, core::ops::Add};
@@ -69,7 +69,7 @@ where
     secret_scalar: NonZeroScalar<C>,
 
     /// Verifying key which corresponds to this signing key.
-    #[cfg(feature = "algorithm")]
+    #[cfg(feature = "signing")]
     verifying_key: VerifyingKey<C>,
 }
 
@@ -115,7 +115,7 @@ where
     }
 
     /// Get the [`VerifyingKey`] which corresponds to this [`SigningKey`].
-    #[cfg(feature = "algorithm")]
+    #[cfg(feature = "signing")]
     pub fn verifying_key(&self) -> &VerifyingKey<C> {
         &self.verifying_key
     }
@@ -420,7 +420,7 @@ where
 // Other trait impls
 //
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "signing")]
 impl<C> AsRef<VerifyingKey<C>> for SigningKey<C>
 where
     C: EcdsaCurve + CurveArithmetic,
@@ -481,12 +481,12 @@ where
     C: EcdsaCurve + CurveArithmetic,
 {
     fn from(secret_scalar: NonZeroScalar<C>) -> Self {
-        #[cfg(feature = "algorithm")]
+        #[cfg(feature = "signing")]
         let public_key = PublicKey::from_secret_scalar(&secret_scalar);
 
         Self {
             secret_scalar,
-            #[cfg(feature = "algorithm")]
+            #[cfg(feature = "signing")]
             verifying_key: public_key.into(),
         }
     }
@@ -542,7 +542,7 @@ where
 
 impl<C> ZeroizeOnDrop for SigningKey<C> where C: EcdsaCurve + CurveArithmetic {}
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "signing")]
 impl<C> From<SigningKey<C>> for VerifyingKey<C>
 where
     C: EcdsaCurve + CurveArithmetic,
@@ -553,7 +553,7 @@ where
     }
 }
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "signing")]
 impl<C> From<&SigningKey<C>> for VerifyingKey<C>
 where
     C: EcdsaCurve + CurveArithmetic,
@@ -564,7 +564,7 @@ where
     }
 }
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "signing")]
 impl<C> KeypairRef for SigningKey<C>
 where
     C: EcdsaCurve + CurveArithmetic,

@@ -42,11 +42,11 @@ mod recovery;
 pub mod der;
 #[cfg(feature = "dev")]
 pub mod dev;
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "verifying")]
 pub mod hazmat;
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "signing")]
 mod signing;
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "verifying")]
 mod verifying;
 
 pub use crate::recovery::RecoveryId;
@@ -58,9 +58,9 @@ pub use elliptic_curve::{self, PrimeCurve, sec1::Sec1Point};
 pub use signature::{self, Error, Result, SignatureEncoding};
 use zeroize::Zeroize;
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "signing")]
 pub use crate::signing::SigningKey;
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "verifying")]
 pub use crate::verifying::VerifyingKey;
 
 use core::{fmt, ops::Add};
@@ -87,7 +87,7 @@ use elliptic_curve::pkcs8::spki::{
 };
 #[cfg(feature = "serde")]
 use serdect::serde::{Deserialize, Serialize, de, ser};
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "verifying")]
 use {
     core::str,
     elliptic_curve::{
@@ -278,7 +278,7 @@ where
     }
 }
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "verifying")]
 impl<C> Signature<C>
 where
     C: EcdsaCurve + CurveArithmetic,
@@ -394,7 +394,7 @@ where
     }
 }
 
-#[cfg(feature = "algorithm")]
+#[cfg(feature = "verifying")]
 impl<C> str::FromStr for Signature<C>
 where
     C: EcdsaCurve + CurveArithmetic,

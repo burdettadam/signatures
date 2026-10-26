@@ -31,6 +31,8 @@ spki = { version = "0.8", optional = true, default-features = false }
 
 [dev-dependencies]
 elliptic-curve = { version = "0.14.2", default-features = false, features = ["dev"] }
+hex-literal = "1"
+p256 = { version = "0.14", default-features = false, features = ["arithmetic", "ecdsa-core", "sha256"] }
 sha2 = { version = "0.11", default-features = false }
 
 [features]
@@ -38,7 +40,11 @@ default = ["digest"]
 alloc = ["elliptic-curve/alloc", "signature/alloc", "spki/alloc"]
 std = ["alloc", "elliptic-curve/std"]
 
-algorithm = ["dep:rfc6979", "digest", "elliptic-curve/arithmetic"]
+# Retain the pre-split feature while allowing public-key-only consumers to
+# exclude RFC6979 and all signing APIs.
+algorithm = ["signing"]
+signing = ["verifying", "dep:rfc6979"]
+verifying = ["digest", "elliptic-curve/arithmetic"]
 dev = ["algorithm", "der", "digest/dev", "elliptic-curve/dev"]
 der = ["dep:der"]
 digest = ["dep:digest", "elliptic-curve/digest", "signature/digest"]

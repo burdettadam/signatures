@@ -12,19 +12,22 @@
 //! FULL PRIVATE KEY RECOVERY!
 //! </div>
 
-use crate::{EcdsaCurve, Error, RecoveryId, Result, Signature};
+#[cfg(feature = "signing")]
+use crate::RecoveryId;
+use crate::{EcdsaCurve, Error, Result, Signature};
 use elliptic_curve::{
-    CurveArithmetic, FieldBytes, NonZeroScalar, ProjectivePoint, Scalar,
+    CurveArithmetic, ProjectivePoint, Scalar,
     bigint::{BitOps, Encoding},
-    ff::PrimeField,
-    group::{Curve as _, Group},
+    group::Curve as _,
     ops::{Invert, MulByGeneratorVartime, Reduce},
     point::AffineCoordinates,
     scalar::IsHigh,
 };
 
-#[cfg(feature = "digest")]
+#[cfg(feature = "signing")]
 use digest::{Digest, block_api::BlockSizeUser};
+#[cfg(feature = "signing")]
+use elliptic_curve::{FieldBytes, NonZeroScalar, ff::PrimeField, group::Group};
 
 /// Sign a prehashed message digest using the provided secret scalar and
 /// ephemeral scalar, returning an ECDSA signature.
@@ -48,6 +51,7 @@ use digest::{Digest, block_api::BlockSizeUser};
 ///
 /// This will return an error if a zero-scalar was generated. It can be tried again with a
 /// different `k`.
+#[cfg(feature = "signing")]
 #[allow(non_snake_case)]
 pub fn sign_prehashed<C>(
     d: &NonZeroScalar<C>,
@@ -99,6 +103,7 @@ where
 /// - `ad`: optional additional data, e.g. added entropy from an RNG
 ///
 /// [RFC6979]: https://datatracker.ietf.org/doc/html/rfc6979
+#[cfg(feature = "signing")]
 pub fn sign_prehashed_rfc6979<C, D>(
     d: &NonZeroScalar<C>,
     z: &[u8],
