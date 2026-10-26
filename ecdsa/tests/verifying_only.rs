@@ -4,9 +4,15 @@
 
 use ecdsa::{RecoveryId, Signature, VerifyingKey, signature::Verifier};
 use hex_literal::hex;
-use p256::{NistP256, SecretKey};
+use p256::NistP256;
 
-// RFC 6979 Appendix A.2.5, also used by p256's own ECDSA tests.
+// RFC 6979 Appendix A.2.5; 0x04 || Ux || Uy is the uncompressed SEC1 key.
+const PUBLIC_KEY: [u8; 65] = hex!(
+    "04
+     60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6
+     7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299"
+);
+#[cfg(feature = "signing")]
 const SECRET: [u8; 32] = hex!("c9afa9d845ba75166b5c215767b1d6934e50c3db36e89b127b8a622b120f6721");
 const SIGNATURE: [u8; 64] = hex!(
     "efd48b2aacb6a8fd1140dd9cd45e81d69d2c877b56aaf991c34d0ea84eaf3716
@@ -15,8 +21,8 @@ const SIGNATURE: [u8; 64] = hex!(
 
 #[test]
 fn verifies_and_recovers_rfc6979_public_vector() {
-    let secret = SecretKey::from_slice(&SECRET).expect("valid test scalar");
-    let verifying_key = VerifyingKey::<NistP256>::from(secret.public_key());
+    let verifying_key =
+        VerifyingKey::<NistP256>::from_sec1_bytes(&PUBLIC_KEY).expect("valid public SEC1 key");
     let signature = Signature::<NistP256>::from_slice(&SIGNATURE).expect("valid test signature");
 
     verifying_key
